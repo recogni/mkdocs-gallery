@@ -99,7 +99,10 @@ def _get_docstring_and_rest(file: Path):
 
     if not isinstance(node, ast.Module):
         raise ExtensionError("This function only supports modules. " "You provided {0}".format(node.__class__.__name__))
-    if not (node.body and isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Str)):
+    first = node.body[0] if node.body else None
+    if not (
+        isinstance(first, ast.Expr) and isinstance(first.value, ast.Constant) and isinstance(first.value.value, str)
+    ):
         raise ExtensionError(
             f'Could not find docstring in file "{file}". '
             "A docstring is required by mkdocs-gallery "
@@ -110,7 +113,7 @@ def _get_docstring_and_rest(file: Path):
         docstring = ast.get_docstring(node)
         assert docstring is not None  # noqa  # should be guaranteed above
         # This is just for backward compat
-        if len(node.body[0].value.s) and node.body[0].value.s[0] == "\n":
+        if len(node.body[0].value.value) and node.body[0].value.value[0] == "\n":
             # just for strict backward compat here
             docstring = "\n" + docstring
         ts = tokenize.tokenize(BytesIO(content.encode()).readline)
@@ -124,7 +127,7 @@ def _get_docstring_and_rest(file: Path):
     else:
         # TODO this block can be removed when python 3.6 support is dropped
         docstring_node = node.body[0]
-        docstring = docstring_node.value.s
+        docstring = docstring_node.value.value
         lineno = docstring_node.lineno  # The last line of the string.
 
     # This get the content of the file after the docstring last line
