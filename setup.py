@@ -15,21 +15,14 @@ See also:
 from setuptools import setup
 
 
-# (1) check required versions (from https://medium.com/@daveshawley/safely-using-setup-cfg-for-metadata-1babbe54c108)
-import pkg_resources
-
-pkg_resources.require("setuptools>=39.2")
-pkg_resources.require("setuptools_scm")
-
-
-# (2) Generate download url using git version
+# (1) Generate download url using git version
 from setuptools_scm import get_version  # noqa: E402
 
 URL = "https://github.com/smarie/mkdocs-gallery"
 DOWNLOAD_URL = URL + "/tarball/" + get_version()
 
 
-# (3) Call setup() with as little args as possible
+# (2) Call setup() with as little args as possible
 setup(
     download_url=DOWNLOAD_URL,
     use_scm_version={
